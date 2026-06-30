@@ -60,13 +60,20 @@ export default function Sidebar({ onFilterChange, currentCategory }: SidebarProp
   const navLinks = [
     { name: 'Home', path: '/', icon: <Home size={20} /> },
     { name: 'AI Agent', path: '/ai', icon: <Bot size={20} /> },
+    { name: 'Recommended Apps', path: '/recommended', icon: <Download size={20} /> },
     { name: '🏆 Leaderboard', path: '/leaderboard', icon: <Trophy size={20} /> },
     { name: 'My Collections', path: '/collections', icon: <Folder size={20} /> },
     { name: 'Blog', path: '/blog', icon: <FileText size={20} /> },
     { name: 'Wishlist', path: '/wishlist', icon: <Heart size={20} /> },
     { name: 'About', path: '/about', icon: <Info size={20} /> },
     { name: 'Contact', path: '/contact', icon: <Mail size={20} /> },
-    ...(isAdmin ? [{ name: 'Admin', path: '/ad/dashboard', icon: <Shield size={20} /> }] : []),
+    ...(isAdmin ? [
+      { name: 'Dashboard', path: '/ad/dashboard', icon: <Shield size={20} /> },
+      { name: 'Manage Games', path: '/ad/games', icon: <Folder size={20} /> },
+      { name: 'Manage Users', path: '/ad/users', icon: <User size={20} /> },
+      { name: 'Manage Posts', path: '/ad/posts', icon: <FileText size={20} /> },
+      { name: 'Manage Comments', path: '/ad/comments', icon: <FileText size={20} /> }
+    ] : []),
   ];
 
   const handleRequestGame = () => {
@@ -166,52 +173,20 @@ export default function Sidebar({ onFilterChange, currentCategory }: SidebarProp
                 <h3 className="text-xs uppercase text-gray-500 font-bold px-3 mb-2">{t('Filters')}</h3>
                 <div className="space-y-1">
                   {categories.map((cat) => (
-                    <button
+                    <Link
                       key={cat}
-                      onClick={() => handleCategoryClick(cat)}
-                      className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                        currentCategory === cat || (cat === 'All' && !currentCategory)
+                      href={cat === 'All' ? '/' : `/?category=${cat}`}
+                      onClick={() => setIsOpen(false)}
+                      className={`block w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                        currentCategory === cat || (cat === 'All' && (!currentCategory || currentCategory === 'All'))
                           ? 'bg-cyan-500/20 text-cyan-500 shadow-[0_0_10px_rgba(0,255,255,0.2)]' 
                           : 'hover:bg-black/5 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300'
                       }`}
                     >
                       {t(cat)}
-                    </button>
+                    </Link>
                   ))}
                 </div>
-              </div>
-
-              <div className="mt-8 mb-6 px-3">
-                <h3 className="text-xs uppercase text-cyan-500 font-black mb-3 drop-shadow-[0_0_5px_rgba(0,255,255,0.5)]">Recommended Apps</h3>
-                <a 
-                  href="https://play.google.com/store/apps/details?id=idm.internet.download.manager&pli=1"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block p-4 rounded-2xl glass bg-white/50 dark:bg-black/20 border border-black/10 dark:border-white/10 hover:bg-white dark:hover:bg-black/40 transition-all group shadow-sm hover:shadow-[0_0_15px_rgba(0,255,255,0.15)]"
-                >
-                  <div className="flex items-center space-x-3 mb-3">
-                    <div className="p-2 rounded-xl bg-cyan-500/20 text-cyan-600 dark:text-cyan-400">
-                      <Download size={20} />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-gray-900 dark:text-white leading-tight">1DM: Browser &<br/>Download Manager</h4>
-                    </div>
-                  </div>
-                  <div className="space-y-2 text-xs text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
-                    <p>
-                      <strong>Why every gamer needs this:</strong> Game Studio offers large 50GB+ PC and console games. Standard mobile browsers often fail, timeout, or corrupt these massive files midway, wasting your precious mobile data.
-                    </p>
-                    <p>
-                      <strong>The Solution:</strong> 1DM uses advanced multi-threaded downloading to accelerate speeds up to 10x. It guarantees stable downloads with full Pause and Resume support.
-                    </p>
-                    <p>
-                      <strong>How to use:</strong> Simply copy any game download link from our site (like GDrive, Mega, or 1Fichier) and paste it directly into 1DM. It handles background downloading perfectly so you can close the app while your game downloads safely.
-                    </p>
-                  </div>
-                  <div className="w-full py-2 rounded-xl bg-cyan-500 text-white text-center font-bold text-sm shadow-[0_0_10px_rgba(0,255,255,0.3)] group-hover:bg-cyan-400 transition-colors">
-                    Get 1DM Free
-                  </div>
-                </a>
               </div>
             </nav>
 

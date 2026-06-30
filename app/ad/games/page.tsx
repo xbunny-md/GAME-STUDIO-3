@@ -21,6 +21,7 @@ export default function GamesPage() {
   const [size, setSize] = useState('');
   const [image, setImage] = useState('');
   const [description, setDescription] = useState('');
+  const [isHot, setIsHot] = useState(false);
   const [downloads, setDownloads] = useState<{ name: string; url: string; color: string; icon: string }[]>([{ name: '', url: '', color: '#06b6d4', icon: 'download' }]);
 
   useEffect(() => {
@@ -35,7 +36,7 @@ export default function GamesPage() {
 
   const resetForm = () => {
     setEditingId(null);
-    setTitle(''); setSlug(''); setSize(''); setImage(''); setDescription(''); setCategory('PC');
+    setTitle(''); setSlug(''); setSize(''); setImage(''); setDescription(''); setCategory('PC'); setIsHot(false);
     setDownloads([{ name: '', url: '', color: '#06b6d4', icon: 'download' }]);
     setIsGameModalOpen(false);
   };
@@ -48,6 +49,7 @@ export default function GamesPage() {
     setSize(game.data.size || '');
     setImage(game.data.image || '');
     setDescription(game.data.description || '');
+    setIsHot(!!game.data.isHot);
     setDownloads(game.data.downloads?.length ? game.data.downloads : [{ name: '', url: '', color: '#06b6d4', icon: 'download' }]);
     setIsGameModalOpen(true);
   };
@@ -64,6 +66,30 @@ export default function GamesPage() {
     setDeleteConfirmId(null);
   };
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const json = JSON.parse(event.target?.result as string);
+        if (json.title) setTitle(json.title);
+        if (json.slug) setSlug(json.slug);
+        if (json.category) setCategory(json.category);
+        if (json.size) setSize(json.size);
+        if (json.image) setImage(json.image);
+        if (json.description) setDescription(json.description);
+        if (json.isHot !== undefined) setIsHot(json.isHot);
+        if (json.downloads && Array.isArray(json.downloads)) setDownloads(json.downloads);
+        toast.success('JSON loaded successfully!');
+      } catch (error) {
+        toast.error('Invalid JSON file');
+      }
+    };
+    reader.readAsText(file);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormLoading(true);
@@ -74,6 +100,7 @@ export default function GamesPage() {
       size,
       image,
       description,
+      isHot,
       downloads: downloads.filter(d => d.name.trim() !== '' && d.url.trim() !== '')
     };
 
