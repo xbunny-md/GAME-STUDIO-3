@@ -154,16 +154,37 @@ export default function Home({ currentCategory }: HomeProps) {
           {[...Array(8)].map((_, i) => <SkeletonGameCard key={i} />)}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4 pb-20">
-          {filteredGames.length > 0 ? (
-            filteredGames.map(game => (
-              <GameCard key={game.id} game={game} />
-            ))
-          ) : (
-            <div className="col-span-full text-center py-20 text-gray-500">
-              <p className="text-lg">{t('No games found matching your criteria.')}</p>
+        <div className="px-4 pb-20 space-y-12">
+          {(!currentCategory || currentCategory === 'All') && filteredGames.some(g => g.data.isHot) && !search && (
+            <div>
+              <div className="flex items-center space-x-2 mb-6">
+                <span className="text-2xl">🔥</span>
+                <h2 className="text-2xl font-black text-white glow-text">Hot Games</h2>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {filteredGames.filter(g => g.data.isHot).map(game => (
+                  <GameCard key={`hot-${game.id}`} game={game} />
+                ))}
+              </div>
             </div>
           )}
+
+          <div>
+            {(!currentCategory || currentCategory === 'All') && !search && (
+              <h2 className="text-2xl font-black text-white glow-text mb-6">All Games</h2>
+            )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredGames.length > 0 ? (
+                filteredGames.map(game => (
+                  <GameCard key={game.id} game={game} />
+                ))
+              ) : (
+                <div className="col-span-full text-center py-20 text-gray-500">
+                  <p className="text-lg">{t('No games found matching your criteria.')}</p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>

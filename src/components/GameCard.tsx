@@ -30,6 +30,11 @@ export default function GameCard({ game }: GameCardProps) {
             <span className="px-3 py-1 rounded-full text-xs font-bold text-white bg-cyan-500/50 backdrop-blur-md border border-cyan-400/30">
               {game.data.category}
             </span>
+            {game.data.isHot && (
+              <span className="px-3 py-1 rounded-full text-xs font-bold text-white bg-red-500/50 backdrop-blur-md border border-red-400/30">
+                🔥 Hot
+              </span>
+            )}
           </div>
         </div>
         <div className="p-5 flex-1 flex flex-col">

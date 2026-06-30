@@ -24,6 +24,11 @@ export default function GamesPage() {
   const [isHot, setIsHot] = useState(false);
   const [downloads, setDownloads] = useState<{ name: string; url: string; color: string; icon: string }[]>([{ name: '', url: '', color: '#06b6d4', icon: 'download' }]);
 
+  const [videoUrl, setVideoUrl] = useState('');
+  const [features, setFeatures] = useState<string[]>(['']);
+  const [screenshots, setScreenshots] = useState<string[]>(['']);
+  const [specs, setSpecs] = useState<{ label: string; value: string }[]>([{ label: 'OS', value: '' }]);
+
   useEffect(() => {
     fetchGames();
   }, []);
@@ -37,6 +42,10 @@ export default function GamesPage() {
   const resetForm = () => {
     setEditingId(null);
     setTitle(''); setSlug(''); setSize(''); setImage(''); setDescription(''); setCategory('PC'); setIsHot(false);
+    setVideoUrl('');
+    setFeatures(['']);
+    setScreenshots(['']);
+    setSpecs([{ label: 'OS', value: '' }]);
     setDownloads([{ name: '', url: '', color: '#06b6d4', icon: 'download' }]);
     setIsGameModalOpen(false);
   };
@@ -50,6 +59,10 @@ export default function GamesPage() {
     setImage(game.data.image || '');
     setDescription(game.data.description || '');
     setIsHot(!!game.data.isHot);
+    setVideoUrl(game.data.videoUrl || '');
+    setFeatures(game.data.features?.length ? game.data.features : ['']);
+    setScreenshots(game.data.screenshots?.length ? game.data.screenshots : ['']);
+    setSpecs(game.data.specs?.length ? game.data.specs : [{ label: 'OS', value: '' }]);
     setDownloads(game.data.downloads?.length ? game.data.downloads : [{ name: '', url: '', color: '#06b6d4', icon: 'download' }]);
     setIsGameModalOpen(true);
   };
@@ -81,6 +94,10 @@ export default function GamesPage() {
         if (json.image) setImage(json.image);
         if (json.description) setDescription(json.description);
         if (json.isHot !== undefined) setIsHot(json.isHot);
+        if (json.videoUrl) setVideoUrl(json.videoUrl);
+        if (json.features && Array.isArray(json.features)) setFeatures(json.features);
+        if (json.screenshots && Array.isArray(json.screenshots)) setScreenshots(json.screenshots);
+        if (json.specs && Array.isArray(json.specs)) setSpecs(json.specs);
         if (json.downloads && Array.isArray(json.downloads)) setDownloads(json.downloads);
         toast.success('JSON loaded successfully!');
       } catch (error) {
@@ -101,6 +118,10 @@ export default function GamesPage() {
       image,
       description,
       isHot,
+      videoUrl,
+      features: features.filter(f => f.trim() !== ''),
+      screenshots: screenshots.filter(s => s.trim() !== ''),
+      specs: specs.filter(s => s.label.trim() !== '' && s.value.trim() !== ''),
       downloads: downloads.filter(d => d.name.trim() !== '' && d.url.trim() !== '')
     };
 
@@ -213,6 +234,17 @@ export default function GamesPage() {
         maxWidth="max-w-4xl"
       >
         <form onSubmit={handleSubmit} className="space-y-8 pb-8">
+          <div className="flex items-center justify-between bg-cyan-500/10 p-4 rounded-2xl border border-cyan-500/20">
+            <div className="space-y-1">
+              <h3 className="text-sm font-bold text-cyan-500">Import from JSON</h3>
+              <p className="text-xs text-gray-500">Auto-fill this form by uploading a game JSON file.</p>
+            </div>
+            <label className="cursor-pointer bg-cyan-500 hover:bg-cyan-400 text-white px-4 py-2 rounded-xl font-bold text-sm transition-colors shadow-[0_0_10px_rgba(0,255,255,0.2)]">
+              Upload JSON
+              <input type="file" accept=".json" className="hidden" onChange={handleFileUpload} />
+            </label>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-bold text-gray-700 dark:text-gray-300">Title</label>
@@ -241,23 +273,73 @@ export default function GamesPage() {
               <input type="url" required value={image} onChange={e => setImage(e.target.value)} className="w-full glass-dark rounded-xl px-4 py-3 outline-none focus:border-cyan-500 text-gray-900 dark:text-white border border-black/10 dark:border-white/10 bg-white/50 dark:bg-transparent" />
             </div>
             <div className="col-span-full space-y-2">
+              <label className="text-sm font-bold text-gray-700 dark:text-gray-300">YouTube Trailer URL</label>
+              <input type="url" value={videoUrl} onChange={e => setVideoUrl(e.target.value)} className="w-full glass-dark rounded-xl px-4 py-3 outline-none focus:border-cyan-500 text-gray-900 dark:text-white border border-black/10 dark:border-white/10 bg-white/50 dark:bg-transparent" placeholder="e.g. https://www.youtube.com/embed/..." />
+            </div>
+            <div className="col-span-full space-y-2">
               <label className="text-sm font-bold text-gray-700 dark:text-gray-300">Description</label>
               <textarea required rows={4} value={description} onChange={e => setDescription(e.target.value)} className="w-full glass-dark rounded-xl px-4 py-3 outline-none focus:border-cyan-500 text-gray-900 dark:text-white border border-black/10 dark:border-white/10 bg-white/50 dark:bg-transparent resize-none" />
             </div>
+            <div className="col-span-full flex items-center space-x-3 pt-2">
+              <input type="checkbox" id="isHot" checked={isHot} onChange={e => setIsHot(e.target.checked)} className="w-5 h-5 accent-cyan-500 rounded focus:ring-cyan-500" />
+              <label htmlFor="isHot" className="text-sm font-bold text-gray-700 dark:text-gray-300 cursor-pointer">Mark as Hot Game 🔥</label>
+            </div>
           </div>
 
-          <div className="space-y-3">
-            <div className="flex justify-between items-center border-b border-black/10 dark:border-white/10 pb-2">
-              <h3 className="font-bold text-gray-900 dark:text-white">Download Links</h3>
-              <button type="button" onClick={() => handleAddItem(setDownloads, {name: '', url: '', color: '#06b6d4', icon: 'download'})} className="text-cyan-600 dark:text-cyan-500 p-1 hover:bg-cyan-500/10 rounded"><Plus size={18} /></button>
-            </div>
-            {downloads.map((dl, idx) => (
-              <div key={idx} className="flex flex-col sm:flex-row gap-2">
-                <input type="text" value={dl.name} onChange={e => handleUpdateItem(setDownloads, idx, { ...dl, name: e.target.value })} className="flex-1 glass-dark rounded-xl px-4 py-2 outline-none focus:border-cyan-500 text-gray-900 dark:text-white border border-black/10 dark:border-white/10 bg-white/50 dark:bg-transparent" placeholder="Link Name (e.g. Mega)" />
-                <input type="text" value={dl.url} onChange={e => handleUpdateItem(setDownloads, idx, { ...dl, url: e.target.value })} className="flex-1 glass-dark rounded-xl px-4 py-2 outline-none focus:border-cyan-500 text-gray-900 dark:text-white border border-black/10 dark:border-white/10 bg-white/50 dark:bg-transparent" placeholder="URL" />
-                <button type="button" onClick={() => handleRemoveItem(setDownloads, idx)} className="text-red-500 p-2"><Trash size={18} /></button>
+          <div className="space-y-6">
+            <div className="space-y-3 bg-white/5 border border-white/10 rounded-2xl p-4">
+              <div className="flex justify-between items-center border-b border-black/10 dark:border-white/10 pb-2">
+                <h3 className="font-bold text-gray-900 dark:text-white">Features / Instructions</h3>
+                <button type="button" onClick={() => handleAddItem(setFeatures, '')} className="text-cyan-600 dark:text-cyan-500 p-1 hover:bg-cyan-500/10 rounded"><Plus size={18} /></button>
               </div>
-            ))}
+              {features.map((feature, idx) => (
+                <div key={idx} className="flex gap-2">
+                  <input type="text" value={feature} onChange={e => handleUpdateItem(setFeatures, idx, e.target.value)} className="flex-1 glass-dark rounded-xl px-4 py-2 outline-none focus:border-cyan-500 text-gray-900 dark:text-white border border-black/10 dark:border-white/10 bg-white/50 dark:bg-transparent" placeholder="Feature or instruction step" />
+                  <button type="button" onClick={() => handleRemoveItem(setFeatures, idx)} className="text-red-500 p-2"><Trash size={18} /></button>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-3 bg-white/5 border border-white/10 rounded-2xl p-4">
+              <div className="flex justify-between items-center border-b border-black/10 dark:border-white/10 pb-2">
+                <h3 className="font-bold text-gray-900 dark:text-white">Screenshots (URLs)</h3>
+                <button type="button" onClick={() => handleAddItem(setScreenshots, '')} className="text-cyan-600 dark:text-cyan-500 p-1 hover:bg-cyan-500/10 rounded"><Plus size={18} /></button>
+              </div>
+              {screenshots.map((url, idx) => (
+                <div key={idx} className="flex gap-2">
+                  <input type="url" value={url} onChange={e => handleUpdateItem(setScreenshots, idx, e.target.value)} className="flex-1 glass-dark rounded-xl px-4 py-2 outline-none focus:border-cyan-500 text-gray-900 dark:text-white border border-black/10 dark:border-white/10 bg-white/50 dark:bg-transparent" placeholder="Screenshot URL" />
+                  <button type="button" onClick={() => handleRemoveItem(setScreenshots, idx)} className="text-red-500 p-2"><Trash size={18} /></button>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-3 bg-white/5 border border-white/10 rounded-2xl p-4">
+              <div className="flex justify-between items-center border-b border-black/10 dark:border-white/10 pb-2">
+                <h3 className="font-bold text-gray-900 dark:text-white">System Requirements</h3>
+                <button type="button" onClick={() => handleAddItem(setSpecs, {label: '', value: ''})} className="text-cyan-600 dark:text-cyan-500 p-1 hover:bg-cyan-500/10 rounded"><Plus size={18} /></button>
+              </div>
+              {specs.map((spec, idx) => (
+                <div key={idx} className="flex flex-col sm:flex-row gap-2">
+                  <input type="text" value={spec.label} onChange={e => handleUpdateItem(setSpecs, idx, { ...spec, label: e.target.value })} className="w-full sm:w-1/3 glass-dark rounded-xl px-4 py-2 outline-none focus:border-cyan-500 text-gray-900 dark:text-white border border-black/10 dark:border-white/10 bg-white/50 dark:bg-transparent" placeholder="Label (e.g. RAM)" />
+                  <input type="text" value={spec.value} onChange={e => handleUpdateItem(setSpecs, idx, { ...spec, value: e.target.value })} className="flex-1 glass-dark rounded-xl px-4 py-2 outline-none focus:border-cyan-500 text-gray-900 dark:text-white border border-black/10 dark:border-white/10 bg-white/50 dark:bg-transparent" placeholder="Value (e.g. 8GB)" />
+                  <button type="button" onClick={() => handleRemoveItem(setSpecs, idx)} className="text-red-500 p-2"><Trash size={18} /></button>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-3 bg-white/5 border border-white/10 rounded-2xl p-4">
+              <div className="flex justify-between items-center border-b border-black/10 dark:border-white/10 pb-2">
+                <h3 className="font-bold text-gray-900 dark:text-white">Download Links</h3>
+                <button type="button" onClick={() => handleAddItem(setDownloads, {name: '', url: '', color: '#06b6d4', icon: 'download'})} className="text-cyan-600 dark:text-cyan-500 p-1 hover:bg-cyan-500/10 rounded"><Plus size={18} /></button>
+              </div>
+              {downloads.map((dl, idx) => (
+                <div key={idx} className="flex flex-col sm:flex-row gap-2">
+                  <input type="text" value={dl.name} onChange={e => handleUpdateItem(setDownloads, idx, { ...dl, name: e.target.value })} className="flex-1 glass-dark rounded-xl px-4 py-2 outline-none focus:border-cyan-500 text-gray-900 dark:text-white border border-black/10 dark:border-white/10 bg-white/50 dark:bg-transparent" placeholder="Link Name (e.g. Mega)" />
+                  <input type="text" value={dl.url} onChange={e => handleUpdateItem(setDownloads, idx, { ...dl, url: e.target.value })} className="flex-1 glass-dark rounded-xl px-4 py-2 outline-none focus:border-cyan-500 text-gray-900 dark:text-white border border-black/10 dark:border-white/10 bg-white/50 dark:bg-transparent" placeholder="URL" />
+                  <button type="button" onClick={() => handleRemoveItem(setDownloads, idx)} className="text-red-500 p-2"><Trash size={18} /></button>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="flex space-x-4 pt-4 border-t border-black/10 dark:border-white/10">

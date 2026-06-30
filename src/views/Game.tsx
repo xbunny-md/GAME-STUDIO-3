@@ -233,19 +233,19 @@ export default function GamePage() {
             </p>
           </section>
 
-          {data.videos && data.videos.length > 0 && (
+          {(data.videos || data.videoUrl) && ((data.videos && data.videos.length > 0) || data.videoUrl) && (
             <section>
               <h2 className="text-2xl font-bold flex items-center space-x-2 mb-4 text-gray-900 dark:text-white">
                 <span>Gameplay & Trailers</span>
               </h2>
-              <div className="rounded-xl overflow-hidden glass">
+              <div className="rounded-xl overflow-hidden glass border border-white/10">
                 <Swiper
                   modules={[Navigation, Pagination]}
                   navigation
                   pagination={{ clickable: true }}
                   className="w-full aspect-video"
                 >
-                  {data.videos.map((vid, idx) => {
+                  {(data.videos || [data.videoUrl]).filter(Boolean).map((vid: string, idx: number) => {
                     const yid = extractYoutubeId(vid);
                     return (
                       <SwiperSlide key={idx}>
@@ -278,7 +278,7 @@ export default function GamePage() {
                   <Info className="text-cyan-500" />
                   <span>System Requirements</span>
                 </h2>
-                <div className="glass p-5 rounded-2xl bg-white/5 dark:bg-black/20 space-y-3">
+                <div className="glass p-5 rounded-2xl bg-white/5 dark:bg-black/20 space-y-3 border border-white/10">
                   {data.specs.map((spec, idx) => (
                     <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-200 dark:border-white/10 pb-2 last:border-0 last:pb-0">
                       <span className="font-semibold text-gray-600 dark:text-gray-400">{spec.label}</span>
@@ -289,14 +289,14 @@ export default function GamePage() {
               </section>
             )}
 
-            {data.steps && data.steps.length > 0 && (
+            {(data.features || data.steps) && (data.features || data.steps).length > 0 && (
               <section>
                 <h2 className="text-xl font-bold flex items-center space-x-2 mb-4 text-gray-900 dark:text-white">
                   <CheckCircle className="text-cyan-500" />
-                  <span>Installation Steps</span>
+                  <span>Features / Installation Steps</span>
                 </h2>
-                <div className="glass p-5 rounded-2xl bg-white/5 dark:bg-black/20 space-y-4">
-                  {data.steps.map((step, idx) => (
+                <div className="glass p-5 rounded-2xl bg-white/5 dark:bg-black/20 space-y-4 border border-white/10">
+                  {(data.features || data.steps).map((step: string, idx: number) => (
                     <div key={idx} className="flex space-x-3">
                       <div className="w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-500 flex items-center justify-center flex-shrink-0 text-sm font-bold border border-cyan-500/30">
                         {idx + 1}
@@ -317,7 +317,7 @@ export default function GamePage() {
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {data.screenshots.map((shot, idx) => (
-                  <div key={idx} className="aspect-video rounded-xl overflow-hidden glass">
+                  <div key={idx} className="aspect-video rounded-xl overflow-hidden glass border border-white/10">
                     <img src={shot} alt={`Screenshot ${idx + 1}`} className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
                   </div>
                 ))}
@@ -339,7 +339,7 @@ export default function GamePage() {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={handleDownloadClick}
-                    className="flex items-center justify-between p-4 rounded-xl glass glow-hover bg-white/5 dark:bg-black/30 group"
+                    className="flex items-center justify-between p-4 rounded-xl glass glow-hover bg-white/5 dark:bg-black/30 group border border-white/10"
                     style={{ borderLeftColor: dl.color || '#06b6d4', borderLeftWidth: '4px' }}
                   >
                     <span className="font-bold text-gray-900 dark:text-white group-hover:text-cyan-400 transition-colors">
