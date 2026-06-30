@@ -1,0 +1,9 @@
+CREATE TABLE games (
+  id uuid default uuid_generate_v4() primary key,
+  slug text unique not null,
+  data jsonb not null,
+  created_at timestamptz default now()
+);
+
+-- Note: Ensure the uuid-ossp extension is enabled if not already.
+-- CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

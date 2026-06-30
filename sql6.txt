@@ -1,0 +1,57 @@
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS is_admin boolean DEFAULT false;
+UPDATE profiles SET is_admin = true WHERE email = 'lupinstarnley009@gmail.com';
+
+CREATE TABLE IF NOT EXISTS comments (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  game_id uuid REFERENCES games(id) ON DELETE CASCADE,
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+  content text,
+  created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at timestamp with time zone,
+  user_email text
+);
+
+ALTER TABLE comments ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Comments are viewable by everyone." ON comments FOR SELECT USING (true);
+CREATE POLICY "Users can insert their own comments." ON comments FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update own comments." ON comments FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete own comments." ON comments FOR DELETE USING (auth.uid() = user_id);
+CREATE POLICY "Admins can delete any comment." ON comments FOR DELETE USING (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = true)
+);
+
+CREATE TABLE IF NOT EXISTS comment_likes (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  comment_id uuid REFERENCES comments(id) ON DELETE CASCADE,
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+  UNIQUE(comment_id, user_id)
+);
+ALTER TABLE comment_likes ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Likes viewable by everyone." ON comment_likes FOR SELECT USING (true);
+CREATE POLICY "Users insert own likes." ON comment_likes FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users delete own likes." ON comment_likes FOR DELETE USING (auth.uid() = user_id);
+
+CREATE TABLE IF NOT EXISTS posts (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug text UNIQUE,
+  title text,
+  cover text,
+  content jsonb,
+  created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Posts viewable by everyone." ON posts FOR SELECT USING (true);
+CREATE POLICY "Admins insert posts." ON posts FOR INSERT WITH CHECK (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = true));
+CREATE POLICY "Admins update posts." ON posts FOR UPDATE USING (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = true));
+CREATE POLICY "Admins delete posts." ON posts FOR DELETE USING (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = true));
+
+CREATE TABLE IF NOT EXISTS wishlists (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+  game_id uuid REFERENCES games(id) ON DELETE CASCADE,
+  UNIQUE(user_id, game_id)
+);
+ALTER TABLE wishlists ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users view own wishlists." ON wishlists FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users insert own wishlists." ON wishlists FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users delete own wishlists." ON wishlists FOR DELETE USING (auth.uid() = user_id);

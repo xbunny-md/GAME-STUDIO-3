@@ -1,0 +1,15 @@
+-- Enable Row Level Security
+ALTER TABLE games ENABLE ROW LEVEL SECURITY;
+
+-- Policy 1: Allow public select
+CREATE POLICY "Allow public select" ON games
+  FOR SELECT
+  TO public
+  USING (true);
+
+-- Policy 2: Allow authenticated insert/update/delete
+CREATE POLICY "Allow authenticated insert/update/delete" ON games
+  FOR ALL
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);

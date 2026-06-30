@@ -1,0 +1,22 @@
+@import "tailwindcss";
+@import "swiper/css";
+@import "swiper/css/navigation";
+@import "swiper/css/pagination";
+
+@variant dark (&:is(.dark *));
+
+@layer utilities {
+  .glass {
+    @apply backdrop-blur-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 shadow-lg;
+  }
+  .glass-dark {
+    @apply backdrop-blur-2xl bg-black/10 dark:bg-white/10 border border-black/10 dark:border-white/10 shadow-lg;
+  }
+  .glow-hover:hover {
+    @apply shadow-[0_0_20px_rgba(0,255,255,0.3)] transition-shadow duration-300;
+  }
+  .glow-text {
+    @apply drop-shadow-[0_0_10px_rgba(0,255,255,0.8)] text-cyan-500;
+  }
+}
+

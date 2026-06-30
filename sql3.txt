@@ -1,0 +1,4 @@
+ALTER TABLE games ADD COLUMN IF NOT EXISTS views int default 0;
+ALTER TABLE games ADD COLUMN IF NOT EXISTS downloads int default 0;
+ALTER TABLE games ADD COLUMN IF NOT EXISTS rating_avg numeric(2,1) default 0;
+ALTER TABLE games ADD COLUMN IF NOT EXISTS rating_count int default 0;

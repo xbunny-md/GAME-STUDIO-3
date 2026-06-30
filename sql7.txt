@@ -1,0 +1,54 @@
+CREATE TABLE IF NOT EXISTS badge_types (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name text UNIQUE,
+  icon_url text,
+  description text
+);
+
+INSERT INTO badge_types (name, icon_url, description) VALUES
+('First Download', '', 'Downloaded your first game.'),
+('Wishlist 10 Games', '', 'Added 10 games to your wishlist.'),
+('Rater #1', 'https://i.ibb.co/Ndn76SMc/IMG-20260630-WA0057.jpg', 'Consistently rating games.'),
+('Comment King', '', 'Active in the comments section.')
+ON CONFLICT (name) DO NOTHING;
+
+CREATE TABLE IF NOT EXISTS achievements (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+  badge_name text REFERENCES badge_types(name) ON DELETE CASCADE,
+  earned_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
+  UNIQUE(user_id, badge_name)
+);
+
+ALTER TABLE achievements ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Achievements viewable by everyone." ON achievements FOR SELECT USING (true);
+CREATE POLICY "Users earn achievements." ON achievements FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE TABLE IF NOT EXISTS ratings (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  game_id uuid REFERENCES games(id) ON DELETE CASCADE,
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+  rating integer CHECK (rating >= 1 AND rating <= 5),
+  created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
+  UNIQUE(game_id, user_id)
+);
+
+ALTER TABLE ratings ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Ratings viewable by everyone." ON ratings FOR SELECT USING (true);
+CREATE POLICY "Users can insert own ratings." ON ratings FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update own ratings." ON ratings FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE TABLE IF NOT EXISTS follows (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  follower_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+  following_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+  created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
+  UNIQUE(follower_id, following_id)
+);
+
+ALTER TABLE follows ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Follows viewable by everyone." ON follows FOR SELECT USING (true);
+CREATE POLICY "Users can follow others." ON follows FOR INSERT WITH CHECK (auth.uid() = follower_id);
+CREATE POLICY "Users can unfollow others." ON follows FOR DELETE USING (auth.uid() = follower_id);
+
+ALTER TABLE games ADD COLUMN IF NOT EXISTS download_count integer DEFAULT 0;

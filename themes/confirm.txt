@@ -1,0 +1,68 @@
+<!-- ==============================================
+     1. CONFIRMATION EMAIL TEMPLATE
+     Paste this into Supabase -> Authentication -> Email Templates -> Confirmation
+     ============================================== -->
+<div style="background-color: #0a0a0a; color: #ffffff; font-family: sans-serif; padding: 40px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); max-width: 600px; margin: 0 auto;">
+  <h1 style="color: #00f5d4; font-size: 24px; text-align: center; letter-spacing: 2px;">GAMES STUDIO</h1>
+  <h2 style="font-size: 20px; margin-top: 20px; text-align: center;">Confirm Your Email</h2>
+  <p style="color: #a3a3a3; text-align: center; margin-bottom: 30px;">Welcome to the ultimate gaming experience. Please confirm your email address to access your account.</p>
+  <div style="text-align: center;">
+    <a href="{{ .ConfirmationURL }}" style="display: inline-block; background-color: #00f5d4; color: #0a0a0a; padding: 14px 28px; text-decoration: none; border-radius: 12px; font-weight: bold; box-shadow: 0 0 15px rgba(0,255,255,0.3);">Confirm Email Address</a>
+  </div>
+</div>
+
+<!-- ==============================================
+     2. RESET PASSWORD EMAIL TEMPLATE
+     Paste this into Supabase -> Authentication -> Email Templates -> Reset Password
+     ============================================== -->
+<div style="background-color: #0a0a0a; color: #ffffff; font-family: sans-serif; padding: 40px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); max-width: 600px; margin: 0 auto;">
+  <h1 style="color: #00f5d4; font-size: 24px; text-align: center; letter-spacing: 2px;">GAMES STUDIO</h1>
+  <h2 style="font-size: 20px; margin-top: 20px; text-align: center;">Reset Your Password</h2>
+  <p style="color: #a3a3a3; text-align: center; margin-bottom: 30px;">Forgot your password? No problem. Click the button below to reset it securely.</p>
+  <div style="text-align: center;">
+    <a href="{{ .ConfirmationURL }}" style="display: inline-block; background-color: #00f5d4; color: #0a0a0a; padding: 14px 28px; text-decoration: none; border-radius: 12px; font-weight: bold; box-shadow: 0 0 15px rgba(0,255,255,0.3);">Reset Password</a>
+  </div>
+</div>
+
+<!-- ==============================================
+     3. NEW GAME ALERT EMAIL TEMPLATE
+     Use this for the Supabase Edge Function / Resend API
+     ============================================== -->
+<div style="background-color: #0a0a0a; color: #ffffff; font-family: sans-serif; padding: 40px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); max-width: 600px; margin: 0 auto;">
+  <h1 style="color: #00f5d4; font-size: 24px; text-align: center; letter-spacing: 2px;">GAMES STUDIO</h1>
+  <h2 style="font-size: 24px; margin-top: 20px; text-align: center;">New Game Added: {{title}}</h2>
+  
+  <div style="margin: 30px 0; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 0 30px rgba(0,255,255,0.1);">
+    <img src="{{cover_image_url}}" alt="{{title}}" style="width: 100%; display: block;" />
+  </div>
+  
+  <div style="background-color: rgba(255,255,255,0.05); padding: 24px; border-radius: 12px; margin-top: 20px; border: 1px solid rgba(255,255,255,0.05);">
+    <p style="color: #ffffff; margin-top: 0; margin-bottom: 15px;"><strong>Category:</strong> <span style="color: #00f5d4;">{{category}}</span></p>
+    <p style="color: #ffffff; margin-top: 0; margin-bottom: 15px;"><strong>Size:</strong> <span style="color: #00f5d4;">{{size}}</span></p>
+    
+    <h3 style="color: #a3a3a3; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-top: 20px; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">System Requirements</h3>
+    <table style="width: 100%; color: #d4d4d4; font-size: 14px; border-collapse: collapse;">
+      <tr>
+        <td style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);"><strong>OS:</strong></td>
+        <td style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: right;">{{os}}</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);"><strong>CPU:</strong></td>
+        <td style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: right;">{{cpu}}</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);"><strong>GPU:</strong></td>
+        <td style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: right;">{{gpu}}</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px 0;"><strong>RAM:</strong></td>
+        <td style="padding: 8px 0; text-align: right;">{{ram}}</td>
+      </tr>
+    </table>
+  </div>
+  
+  <div style="margin-top: 40px; text-align: center;">
+    <a href="https://yourdomain.com/game/{{slug}}" style="display: inline-block; background-color: #00f5d4; color: #0a0a0a; padding: 16px 32px; text-decoration: none; border-radius: 12px; font-weight: bold; margin-right: 15px; box-shadow: 0 0 20px rgba(0,255,255,0.4);">Download Now</a>
+    <a href="{{video_url}}" style="display: inline-block; background-color: rgba(255,255,255,0.1); color: #ffffff; padding: 16px 32px; text-decoration: none; border-radius: 12px; font-weight: bold; border: 1px solid rgba(255,255,255,0.2);">Watch Trailer</a>
+  </div>
+</div>
